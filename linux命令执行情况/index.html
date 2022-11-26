@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta content="yes" name="apple-mobile-web-app-capable" />
+  <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+  <meta name="referrer" content="never">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <meta name="author" content="kveln">
+  <!-- <title>linux 查看命令执行成功与否 | </title>  -->
+  <title>zhangdeanquan's blog</title>
+  <link href="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- <link href="https://zhangdeanquan.github.io/media/css/bootstrap.min.css" rel="stylesheet"> -->
+  <!--  <link href="https://zhangdeanquan.github.io/media/css/all.min.css" rel="stylesheet" type="text/css"> -->
+  <link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+  <link rel="alternate" type="application/rss+xml" title="linux 查看命令执行成功与否 |  » Feed" href="https://zhangdeanquan.github.io/atom.xml">
+  <link rel="stylesheet"href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/styles/androidstudio.min.css">
+  <link href="https://zhangdeanquan.github.io/styles/main.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.10/build/highlight.min.js"></script>
+  <!-- <script src="https://zhangdeanquan.github.io/media/scripts/jquery.min.js"></script> -->
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+    <meta property="og:description" content="linux 查看命令执行成功与否"/>
+    <meta property="og:url" content="https://zhangdeanquan.github.io/linux命令执行情况/"/>
+    <meta property="og:locale" content="zh-CN"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:site_name" content=""/>
+  </head>
+  <body>
+  	<!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="https://zhangdeanquan.github.io"></a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        Menu
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/">home</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/archives">archives</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/tags">tags</a>
+              
+          </li>
+          
+          <li class="nav-item">
+              
+              <a class="nav-link" href="/about">about</a>
+              
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('https://zhangdeanquan.github.io/media/images/home-bg.jpg')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+          	<span class="tags">
+          	 
+            <a href="https://zhangdeanquan.github.io/tag/linux/" class="tag">linux</a>
+            
+        </span>
+            <h1>linux 查看命令执行成功与否</h1>
+            <span class="meta">
+            	Posted on
+              2021-02-04，5 min read
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <p>安装软件，起服务不知道执行情况？</p>
+<p>echo $?<br>
+返回0则表示执行成功</p>
+<pre><code>┌──(root💀kali)-[~]
+└─# apt install tree
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树... 完成
+正在读取状态信息... 完成                 
+将会同时安装下列软件：
+  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386
+  locales rpcsvc-proto
+建议安装：
+  glibc-doc libnss-nis libnss-nisplus manpages-dev
+推荐安装：
+  manpages-dev libc-devtools
+下列【新】软件包将被安装：
+  rpcsvc-proto tree
+下列软件包将被升级：
+  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386
+  locales
+升级了 7 个软件包，新安装了 2 个软件包，要卸载 0 个软件包，有 1676 个软件包未被升级。
+需要下载 13.5 MB 的归档。
+解压缩后将会空出 4,438 kB 的空间。
+您希望继续执行吗？ [Y/n] Y
+获取:1 http://kali.download/kali kali-rolling/main amd64 libc-l10n all 2.34-4 [876 kB]
+获取:2 http://kali.download/kali kali-rolling/main amd64 libc-dev-bin amd64 2.34-4 [246 kB]
+获取:3 http://kali.download/kali kali-rolling/main amd64 libc6-dev amd64 2.34-4 [1,894 kB]
+获取:4 http://kali.download/kali kali-rolling/main amd64 rpcsvc-proto amd64 1.4.2-4 [63.1 kB]                   
+获取:5 http://kali.download/kali kali-rolling/main amd64 libc6-i386 amd64 2.34-4 [2,639 kB]                     
+获取:6 http://kali.download/kali kali-rolling/main amd64 locales all 2.34-4 [4,091 kB]                          
+获取:7 http://kali.download/kali kali-rolling/main amd64 libc6 amd64 2.34-4 [2,765 kB]                          
+获取:8 http://kali.download/kali kali-rolling/main amd64 libc-bin amd64 2.34-4 [897 kB]                         
+获取:9 http://kali.download/kali kali-rolling/main amd64 tree amd64 2.0.3-1 [56.4 kB]                           
+已下载 13.5 MB，耗时 23秒 (579 kB/s)                                                                            
+正在预设定软件包 ...
+(正在读取数据库 ... 系统当前共安装有 267124 个文件和目录。)
+准备解压 .../0-libc-l10n_2.34-4_all.deb  ...
+正在解压 libc-l10n (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../1-libc-dev-bin_2.34-4_amd64.deb  ...
+正在解压 libc-dev-bin (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../2-libc6-dev_2.34-4_amd64.deb  ...
+正在解压 libc6-dev:amd64 (2.34-4) 并覆盖 (2.31-9) ...
+正在替换原软件包中的文件 libc6:amd64 (2.31-9) ...
+正在选中未选择的软件包 rpcsvc-proto。
+准备解压 .../3-rpcsvc-proto_1.4.2-4_amd64.deb  ...
+正在解压 rpcsvc-proto (1.4.2-4) ...
+准备解压 .../4-libc6-i386_2.34-4_amd64.deb  ...
+正在解压 libc6-i386 (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../5-locales_2.34-4_all.deb  ...
+正在解压 locales (2.34-4) 并覆盖 (2.31-9) ...
+准备解压 .../6-libc6_2.34-4_amd64.deb  ...
+Checking for services that may need to be restarted...
+Checking init scripts...
+正在解压 libc6:amd64 (2.34-4) 并覆盖 (2.31-9) ...
+正在设置 libc6:amd64 (2.34-4) ...
+Checking for services that may need to be restarted...
+Checking init scripts...
+
+Restarting services possibly affected by the upgrade:
+  cron: restarting...done.
+
+Services restarted successfully.
+(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)
+准备解压 .../libc-bin_2.34-4_amd64.deb  ...
+正在解压 libc-bin (2.34-4) 并覆盖 (2.31-9) ...
+正在设置 libc-bin (2.34-4) ...
+正在选中未选择的软件包 tree。
+(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)
+准备解压 .../tree_2.0.3-1_amd64.deb  ...
+正在解压 tree (2.0.3-1) ...
+正在设置 libc-l10n (2.34-4) ...
+正在设置 locales (2.34-4) ...
+正在安装新版本配置文件 /etc/locale.alias ...
+Generating locales (this might take a while)...
+  zh_CN.UTF-8... done
+Generation complete.
+正在设置 rpcsvc-proto (1.4.2-4) ...
+正在设置 tree (2.0.3-1) ...
+正在设置 libc6-i386 (2.34-4) ...
+正在设置 libc-dev-bin (2.34-4) ...
+正在设置 libc6-dev:amd64 (2.34-4) ...
+正在处理用于 man-db (2.9.3-2) 的触发器 ...
+正在处理用于 kali-menu (2021.1.4) 的触发器 ...
+正在处理用于 libc-bin (2.34-4) 的触发器 ...
+                                                                                                                 
+┌──(root💀kali)-[~]
+└─# echo $?
+0
+                                                                                                                 
+┌──(root💀kali)-[~]
+└─# 
+</code></pre>
+
+          
+          <p class="next-post">下一篇：
+            <a href="https://zhangdeanquan.github.io/kali设置proxychains/">
+              <span class="post-title">
+                kali下proxychains使用sock5&rarr;
+              </span>
+            </a>
+          </p>
+        
+        <div class="comment">
+          
+        </div>
+      </div>
+    </div>
+  </article>
+ <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <ul class="list-inline text-center">
+            
+            
+            <li class="list-inline-item">
+              <a href="https://github.com/zhangdeanquan" target="_blank">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+            </li>
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+            
+              
+              <li class="list-inline-item">
+              <a href="#" target="_blank">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-rss fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+              </li>
+          </ul>
+          <p class="copyright text-muted"><span></span><br><a href="#" class="Themeinfo">Powered by zhangdeanquan</a></p>
+        </div>
+      </div>
+    </div>
+   </footer>
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <!-- <script src="https://zhangdeanquan.github.io/media/scripts/bootstrap.bundle.min.js"></script> -->
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://cdn.jsdelivr.net/gh/Alanrk/clean-cdn@1.0/scripts/clean-blog.min.js"></script>
+  <!-- <script src="https://zhangdeanquan.github.io/media/scripts/clean-blog.min.js"></script> -->
+  <script src="//instant.page/3.0.0" type="module" defer integrity="sha384-OeDn4XE77tdHo8pGtE1apMPmAipjoxUQ++eeJa6EtJCfHlvijigWiJpD7VDPWXV1"></script>
+  <style type="text/css">a.back_to_top{text-decoration:none;position:fixed;bottom:40px;right:30px;background:#f0f0f0;height:40px;width:40px;border-radius:50%;line-height:36px;font-size:18px;text-align:center;transition-duration:.5s;transition-propety:background-color;display:none}a.back_to_top span{color:#888}a.back_to_top:hover{cursor:pointer;background:#dfdfdf}a.back_to_top:hover span{color:#555}@media print,screen and(max-width:580px){.back_to_top{display:none!important}}</style>
+<a id="back_to_top" href="#" class="back_to_top">
+  <span>▲</span></a>
+<script>$(document).ready((function(_this) {
+    return function() {
+      var bt;
+      bt = $('#back_to_top');
+      if ($(document).width() > 480) {
+        $(window).scroll(function() {
+          var st;
+          st = $(window).scrollTop();
+          if (st > 30) {
+            return bt.css('display', 'block')
+          } else {
+            return bt.css('display', 'none')
+          }
+        });
+        return bt.click(function() {
+          $('body,html').animate({
+            scrollTop: 0
+          },
+          800);
+          return false
+        })
+      }
+    }
+  })(this));</script>
+  </body>
+</html>
+
